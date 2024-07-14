@@ -5,4 +5,4 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(autohdr_force main.c)
 
-target_link_libraries(autohdr_force "$<$<CONFIG:Release>:-s>")
+target_link_libraries(autohdr_force "$<$<CONFIG:Release>:-static>")
