@@ -18,14 +18,14 @@ int CreateDirect3DRegistryKey() {
 
         if (result != ERROR_SUCCESS) {
             // Failed to create the key
-            fprintf(stderr, "Error creating Direct3D key. Error code: %ld\n", result);
+            fprintf(stderr, "创建 Direct3D 键时出错。错误代码: %ld\n", result);
             return 1; // Return an error code
         } else {
-            printf("Direct3D key created successfully.\n");
+            printf("成功创建 Direct3D 键。\n");
         }
     } else {
         // Key already exists
-        printf("Found existing Direct3D key\n");
+        printf("找到现有的 Direct3D 键\n");
         RegCloseKey(hKey);
     }
 
@@ -42,7 +42,7 @@ char *FindSubkeyByName(const char *name) {
     // Try to open the key
     result = RegOpenKeyExA(HKEY_CURRENT_USER, D3D_KEY, 0, KEY_READ, &hKey);
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error opening the registry key. Error code: %ld\n", result);
+        fprintf(stderr, "打开注册表键时出错。错误代码: %ld\n", result);
         return NULL;
     }
 
@@ -87,7 +87,7 @@ int PrintD3DBehaviorsValue(const char *keyPath) {
     // Try to open the key
     result = RegOpenKeyExA(HKEY_CURRENT_USER, keyPath, 0, KEY_READ, &hKey);
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error opening the registry key. Error code: %ld\n", result);
+        fprintf(stderr, "打开注册表键时出错。错误代码: %ld\n", result);
         // this should never happen
         exit(1);
     }
@@ -98,10 +98,10 @@ int PrintD3DBehaviorsValue(const char *keyPath) {
     // Try to read the "D3DBehaviors" string value
     result = RegQueryValueExA(hKey, "D3DBehaviors", NULL, NULL, (LPBYTE) d3dBehaviors, &d3dBehaviorsSize);
     if (result == ERROR_SUCCESS) {
-        printf("D3DBehaviors value: %s\n", d3dBehaviors);
+        printf("D3DBehaviors 值: %s\n", d3dBehaviors);
         return 1;
     } else {
-        printf("No existing D3DBehaviors value\n");
+        printf("没有现有的 D3DBehaviors 值\n");
         return 0;
     }
 
@@ -117,7 +117,7 @@ char *FindFreeApplicationSubkey() {
     // Try to open the key
     result = RegOpenKeyExA(HKEY_CURRENT_USER, D3D_KEY, 0, KEY_READ, &hKey);
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error opening the registry key. Error code: %ld\n", result);
+        fprintf(stderr, "打开注册表键时出错。错误代码: %ld\n", result);
         return NULL;
     }
 
@@ -150,14 +150,14 @@ int CreateRegistryEntry(const char *keyPath, const char *name) {
     // Try to create/open the key
     result = RegCreateKeyExA(HKEY_CURRENT_USER, keyPath, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error creating/opening the registry key. Error code: %ld\n", result);
+        fprintf(stderr, "创建/打开注册表键时出错。错误代码: %ld\n", result);
         return 1; // Return an error code
     }
 
     // Write the 'Name' value
     result = RegSetValueExA(hKey, "Name", 0, REG_SZ, (const BYTE *) name, (DWORD) (strlen(name) + 1));
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error writing the 'Name' value. Error code: %ld\n", result);
+        fprintf(stderr, "写入 'Name' 值时出错。错误代码: %ld\n", result);
         RegCloseKey(hKey);
         return 1; // Return an error code
     }
@@ -176,7 +176,7 @@ int getYesNoResponse(const char *query) {
 
         if (fgets(userInput, sizeof(userInput), stdin) == NULL) {
             // Handle input error
-            fprintf(stderr, "Error reading input.\n");
+            fprintf(stderr, "读取输入时出错。\n");
             return -1; // You can choose an appropriate error code here
         }
 
@@ -188,7 +188,7 @@ int getYesNoResponse(const char *query) {
         } else if (strcmp(userInput, "n") == 0) {
             response = 0;
         } else {
-            printf("Invalid input. Please enter 'y' or 'n'.\n");
+            printf("无效输入。请输入 'y' 或 'n'。\n");
             response = -1; // Set an error value to indicate invalid input
         }
     } while (response == -1);
@@ -203,7 +203,7 @@ BOOL SetRegistryValue(const char *subKeyPath, const char *value) {
     // Open or create the registry key
     result = RegCreateKeyEx(HKEY_CURRENT_USER, subKeyPath, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
     if (result != ERROR_SUCCESS) {
-        fprintf(stderr, "Error opening or creating registry key: %ld\n", result);
+        fprintf(stderr, "打开或创建注册表键时出错: %ld\n", result);
         return FALSE;
     }
 
@@ -211,7 +211,7 @@ BOOL SetRegistryValue(const char *subKeyPath, const char *value) {
         // Set the registry value if the provided string is not NULL
         result = RegSetValueEx(hKey, "D3DBehaviors", 0, REG_SZ, (BYTE *) value, strlen(value) + 1);
         if (result != ERROR_SUCCESS) {
-            fprintf(stderr, "Error setting registry value: %ld\n", result);
+            fprintf(stderr, "设置注册表值时出错: %ld\n", result);
             RegCloseKey(hKey);
             return FALSE;
         }
@@ -219,16 +219,17 @@ BOOL SetRegistryValue(const char *subKeyPath, const char *value) {
         // Delete the registry value if the provided string is NULL
         result = RegDeleteValue(hKey, "D3DBehaviors");
         if (result != ERROR_SUCCESS && result != ERROR_FILE_NOT_FOUND) {
-            fprintf(stderr, "Error deleting registry value: %ld\n", result);
+            fprintf(stderr, "删除注册表值时出错: %ld\n", result);
             RegCloseKey(hKey);
             return FALSE;
-        }
+       
+
+ }
     }
 
     RegCloseKey(hKey);
     return TRUE;
 }
-
 
 int main(int argc, char *argv[]) {
     if (CreateDirect3DRegistryKey()) {
@@ -242,9 +243,9 @@ int main(int argc, char *argv[]) {
         strncpy(path, argv[1], PATH_MAX - 1);
     } else if (argc == 1) {
         // No command line argument provided, prompt the user for a path
-        printf("Enter an exe name or full path: ");
+        printf("输入exe文件名或完整路径: ");
         if (fgets(path, PATH_MAX, stdin) == NULL) {
-            fprintf(stderr, "Error reading input.\n");
+            fprintf(stderr, "读取输入时出错。\n");
             return 1;
         }
         // Remove the newline character if present
@@ -254,9 +255,18 @@ int main(int argc, char *argv[]) {
         }
     } else {
         // More than one command line argument provided, print an error
-        fprintf(stderr, "Error: Too many command line arguments.\n");
+        fprintf(stderr, "错误: 命令行参数过多。\n");
         return 1;
     }
+
+    // Remove unnecessary double quotes from the path
+    char *start = path;
+    char *end = path + strlen(path) - 1;
+    if (*start == '"' && *end == '"') {
+        *end = '\0';
+        start++;
+    }
+    memmove(path, start, strlen(start) + 1);
 
     char *exe_name = path;
     // replace forward slashes with backslashes in path
@@ -272,7 +282,7 @@ int main(int argc, char *argv[]) {
 
     int behaviorExists = 0;
     if (key) {
-        printf("Found existing key for game (");
+        printf("找到现有游戏键 (");
         {
             const char *lastPart = strrchr(key, '\\');
 
@@ -286,7 +296,7 @@ int main(int argc, char *argv[]) {
         behaviorExists = PrintD3DBehaviorsValue(key);
     } else {
         char *new_subkey = FindFreeApplicationSubkey();
-        printf("No existing key found, will be created as %s\n", new_subkey);
+        printf("未找到现有键，将创建为 %s\n", new_subkey);
         size_t keyLength = strlen(D3D_KEY "\\") + strlen(new_subkey) + 1; // +1 for null terminator
 
         // Allocate memory for the new key
@@ -303,22 +313,22 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int result = getYesNoResponse("Force enable Auto HDR?");
+    int result = getYesNoResponse("强制启用 Auto HDR 吗?");
     if (result == 0) {
         if (behaviorExists) {
-            result = getYesNoResponse("Delete existing D3DBehaviors?");
+            result = getYesNoResponse("删除现有的 D3DBehaviors 吗?");
             if (result) {
                 if (SetRegistryValue(key, NULL)) {
-                    puts("Success!\n");
+                    puts("成功!\n");
                 }
             }
         } else {
-            puts("Nothing to do");
+            puts("无事可做");
         }
         return 0;
     }
 
-    result = getYesNoResponse("Enable 10 bit?");
+    result = getYesNoResponse("启用 10 Bit色深吗?");
 
     char *behaviorVal;
     if (result) {
@@ -328,9 +338,8 @@ int main(int argc, char *argv[]) {
     }
 
     if (SetRegistryValue(key, behaviorVal)) {
-        puts("Success!\n");
+        puts("成功!\n");
     }
 
     return 0;
-
 }
